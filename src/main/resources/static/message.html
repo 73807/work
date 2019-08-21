@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>留言板</title>
+    <meta charset="UTF-8">
+    <style>
+        div {
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            margin: 0 auto;
+        }
+
+        h3 {
+            text-align: center
+        }
+
+        #container {
+            width: 500px;
+        }
+
+        .article {
+            border: 1px solid #a6cbe7;
+            margin-top: 5px;
+        }
+
+        .author {
+            background-color: #0099FF;
+            width: 100%;
+            height: 24px;
+            line-height: 24px;
+        }
+
+        .content {
+            height: 40px;
+            padding: 10px;
+        }
+
+        .author span {
+            float: right;
+            padding-right: 10px;
+        }
+
+        .time {
+            border-top: solid 1px #a6cbe7;
+        }
+
+        .page {
+            text-align: right;
+            height: 30px;
+            line-height: 30px;
+            padding-right: 10px;
+        }
+    </style>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script>
+        var pageNum=1;
+        $(function () {
+            $(".article").remove()  //异常模板页面
+            show();  //显示ajax返回的页面，从数据库中取返回的数据
+            $("input[name='send']").click(function () {
+                $.ajax({        //按下send按钮后的，向数据库中插入操作
+                    url:"http://localhost:8080/send",
+                    type:"post",
+                    dataType:"json",
+                    data:{    //传过去数据部分，名字一定要和数据库中的列名一样，不然会变成null
+                        author:$("input[name='author']").val(),
+                        msg:$("textarea[name='message']").val(),
+                    },
+                    success:function () {
+                        // alert(data);
+                        window.location.href="http://localhost:8080/message.html";//页面跳转的地址
+                    }
+                });
+            })
+            $("input[value=上一页]").click(function () {
+                if(pageNum>=2) {
+                    $.ajax({
+                        url: "http://localhost:8080/get",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            pageSize: 4,
+                            pageNum: --pageNum,
+                        },
+                        success: function (data) {
+                            show_page(data)
+                        }
+                    })
+                }else{
+                    alert("已经到第一页")
+                }
+            });
+            $("input[value=下一页]").click(function () {
+                $.ajax({
+                    url: "http://localhost:8080/get",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        pageSize: 4,
+                        pageNum: ++pageNum,
+                    },
+                    success: function (data) {
+                            if (data == null) {
+                            alert("已经显示了所有的信息");
+                            pageNum--;
+                        }else {
+                            show_page(data)
+                        }
+                    }
+
+                })
+            })
+        })
+            function show() {
+                $.ajax({
+                    url:"http://localhost:8080/get",
+                    type:"post",
+                    dataType:"json",
+                    data:{
+                        pageNum:1,
+                        pageSize:4,
+                    },
+                    success:function (data) {
+                         show_page(data);
+                    }
+                })
+            }
+            function  show_page(data) {
+                $(".article").remove();
+                // alert(data)提示弹窗出数据库中发送过来的所有信息
+                for (var i = data.length-1; i >=0; i--) {  //倒叙输出各条记录信息
+                    //用"""(分号)隔开，就是原先模板里的没变，用" " 来保证原先的信息，然后用  +单条数据属性+  来将数据加到模板块中
+                    /*遍历，每条数据库中信息加到模板里*/ var $article_h = $("<div class=\"article\"> <div class=\"author\">用户:" + data[i].author +
+                        "<span>12#</span></div><div class=\"content\">"+ data[i].msg +
+                        "</div><div class=\"time page\">发表于"+ data[i].date+"</div></div>" );
+                    $("#container :first").append($article_h);//将填充好的模板插入到留言板块下，first不能少，‘：’是筛选意思，first是第一个元素
+                }
+
+            }
+    </script>
+</head>
+
+<body>
+<div id="container">
+    <div><h3>留言板</h3></div>
+    <div class="article">
+        <div class="author">用户:<span>12#</span></div>
+        <div class="content"></div>
+        <div class="time page">发表于</div>
+    </div>
+    <div class="page">
+        <input class="btn1" type="button" value="上一页" onClick="">
+        <input class="btn1" type="button" value="下一页" onClick="">
+    </div><br>
+    <div>
+        <form action="doPost.jsp" method="post">
+            <div>
+                用户: <input type="text" name="author" value=""/>
+            </div><br>
+            <div>
+                留言: <textarea name="message" rows="5" cols="72" >
+            </textarea>
+            </div>
+            <div align="center"><input type="reset" value="清除"/> <input name="send" type="submit" value="发表"/></div>
+        </form>
+    </div>
+</div>
+<ul></ul>
+</body>
+</html>

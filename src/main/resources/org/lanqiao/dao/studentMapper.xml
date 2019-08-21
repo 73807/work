@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.lanqiao.dao.studentMapper" >
+  <resultMap id="studentResultMap" type="org.lanqiao.entity.student" >
+    <id column="sid" property="sid" jdbcType="INTEGER" />
+    <result column="sname" property="sname" jdbcType="VARCHAR" />
+    <result column="classes" property="classes" jdbcType="INTEGER" />
+<!--    <association property="teacher"  resultMap="classesResultMap"></association>-->
+<!--  </resultMap>-->
+<!--  <resultMap id="classesResultMap" type="org.lanqiao.entity.classes" >-->
+<!--    <id column="cid" property="cid" jdbcType="INTEGER" />-->
+<!--    <result column="cname" property="cname" jdbcType="VARCHAR" />-->
+<!--    <result column="teacher" property="teacher" jdbcType="INTEGER" />-->
+<!-- <association property="classes" jdbcType="org.lanqiao.entity.classes">-->
+<!--         <id column="cid" property="cid" jdbcType="INTEGER" />-->
+<!--         <result column="cname" property="cname" jdbcType="VARCHAR" />-->
+<!--         <result column="teacher" property="teacher" jdbcType="INTEGER" />-->
+<!-- </association>-->
+      <association property="clas" javaType="org.lanqiao.entity.classes">
+                   <id column="cid" property="cid" jdbcType="INTEGER" />
+                   <result column="cname" property="cname" jdbcType="VARCHAR" />
+                   <result column="teacher" property="teacher" jdbcType="INTEGER" />
+      </association>
+  </resultMap>
+    <select id="selectById1" resultMap="studentResultMap" parameterType="java.lang.Integer" >
+        select sid,sname,classes,cid,cname,teacher from student ,classes where sid=#{xxx};
+    </select>
+  <sql id="Base_Column_List" >
+    sid, sname, classes
+  </sql>
+<!--    <select id="selectByclasses" resultMap="studentResultMap">-->
+<!--        select s.* ,c.* from student s,classes c where s.classes=#{classes};-->
+<!--    </select>-->
+  <select id="selectByPrimaryKey" resultMap="studentResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from student
+    where sid = #{sid,jdbcType=INTEGER}
+   <!-- select * from classes c,student s  where c.classes=#{classes};-->
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from student
+    where sid = #{sid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.lanqiao.entity.student" >
+    insert into student (sid, sname, classes
+      )
+    values (#{sid,jdbcType=INTEGER}, #{sname,jdbcType=VARCHAR}, #{classes,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.lanqiao.entity.student" >
+    insert into student
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="sname != null" >
+        sname,
+      </if>
+      <if test="classes != null" >
+        classes,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sid != null" >
+        #{sid,jdbcType=INTEGER},
+      </if>
+      <if test="sname != null" >
+        #{sname,jdbcType=VARCHAR},
+      </if>
+      <if test="classes != null" >
+        #{classes,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.lanqiao.entity.student" >
+    update student
+    <set >
+      <if test="sname != null" >
+        sname = #{sname,jdbcType=VARCHAR},
+      </if>
+      <if test="classes != null" >
+        classes = #{classes,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sid = #{sid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.lanqiao.entity.student" >
+    update student
+    set sname = #{sname,jdbcType=VARCHAR},
+      classes = #{classes,jdbcType=INTEGER}
+    where sid = #{sid,jdbcType=INTEGER}
+  </update>
+</mapper>

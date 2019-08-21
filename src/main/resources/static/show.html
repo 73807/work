@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>form_test</title>
+    <style type="text/css">.ret{color: red;}</style>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script>
+        var pageNum=1;
+        $(function (){
+            $.ajax({
+                url:"http://localhost:8080/get",
+                type:"post",
+                dataType:"json",
+                data:{
+                    pageSize:4,
+                    pageNum: pageNum
+                },
+                success:function (data) {
+                    // alert(data);
+            show_page(data);
+
+                }
+            });
+            $("#pre").bind("click",function () {
+                if(pageNum>=2) {
+                    $.ajax({
+                        url: "http://localhost:8080/get",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            pageSize: 4,
+                            pageNum: --pageNum,
+                        },
+                        success: function (data) {
+                                show_page(data)
+                        }
+
+                    })
+                }else{
+                    alert("已经到第一页")
+                }
+            });
+            $("#next").bind("click",function () {
+                    $.ajax({
+                        url: "http://localhost:8080/get",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            pageSize: 4,
+                            pageNum: ++pageNum,
+                        },
+                        success: function (data) {
+                            show_page(data)
+                        }
+
+                    })
+            });
+        })
+        function show_page( data){
+            $("ul li").remove();
+            for(var i=0;i<data.length;i++){
+                var $li=$("<li>"+data[i].id+data[i].author+data[i].msg+data[i].date+"</li>");
+                $("ul").append($li);
+            }
+        }
+
+    </script>
+</head>
+<body>
+<ul>
+</ul>
+<div id="pre">上一页</div>
+<div id="next">下一页</div>
+</body>
+</html>
